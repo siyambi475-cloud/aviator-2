@@ -86,7 +86,7 @@
 
         .status {
             font-size: 14px;
-            color: #ffb300;
+            color: #00e676;
             font-weight: 600;
             margin-top: 10px;
             display: flex;
@@ -98,9 +98,9 @@
         .status-dot {
             width: 8px;
             height: 8px;
-            background-color: #ffb300;
+            background-color: #00e676;
             border-radius: 50%;
-            box-shadow: 0 0 8px #ffb300;
+            box-shadow: 0 0 8px #00e676;
             animation: blink 1s infinite;
         }
 
@@ -163,19 +163,19 @@
         </div>
 
         <div class="signal-box">
-            <div class="signal-title" id="box-title">সার্ভার অ্যানালাইসিস</div>
-            <div class="multiplier" id="multiplier-display">LOCKED</div>
+            <div class="signal-title" id="box-title">পরবর্তী সিগন্যাল টার্গেট</div>
+            <div class="multiplier" id="multiplier-display">1.40x</div>
             <div class="status" id="status-container">
                 <div class="status-dot" id="status-dot"></div>
-                <span id="status-text">অ্যানালাইসিস চলছে...</span>
+                <span id="status-text">সিগন্যাল প্রস্তুত</span>
             </div>
         </div>
 
         <div class="timer-box" id="timer-text">
-            সার্ভার ডাটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...
+            নতুন সিগন্যাল জেনারেট করতে নিচের বোতামটি চাপুন
         </div>
 
-        <button class="btn-generate" id="generate-btn" onclick="generateSignal()" disabled>লকড আছে</button>
+        <button class="btn-generate" id="generate-btn" onclick="generateSignal()">নতুন সিগন্যাল</button>
 
         <div class="footer-note">
             সর্বোচ্চ লিমিট losss লিমিট ২ রাউন্ড। ২ রাউন্ডের বেশি লস দিলে আবার ১৫ মিনিট পর ডুকবেন। সমস্যা হলে টেলেগ্রামে যোগাযোগ করুন 
@@ -184,91 +184,6 @@
 
     <script>
         let isWaiting = false;
-        let analysisInterval;
-        
-        const ANALYSIS_TIME = 15 * 60 * 1000; 
-        const REFRESH_CYCLE = 10 * 60 * 60 * 1000; 
-
-        window.onload = function() {
-            checkAnalysisTimer();
-        };
-
-        function checkAnalysisTimer() {
-            const now = new Date().getTime();
-            let startTime = localStorage.getItem('aviator_start_time');
-            let lastCycleTime = localStorage.getItem('aviator_cycle_time');
-
-            if (!lastCycleTime || (now - lastCycleTime >= REFRESH_CYCLE)) {
-                localStorage.setItem('aviator_cycle_time', now);
-                localStorage.removeItem('aviator_start_time');
-                startTime = null;
-            }
-
-            if (!startTime) {
-                localStorage.setItem('aviator_start_time', now);
-                startTime = now;
-            }
-
-            const elapsedTime = now - startTime;
-            const remainingTime = ANALYSIS_TIME - elapsedTime;
-
-            if (remainingTime > 0) {
-                startAnalysisCountdown(remainingTime);
-            } else {
-                unlockSignalButton();
-            }
-        }
-
-        function startAnalysisCountdown(duration) {
-            const timerText = document.getElementById('timer-text');
-            const btn = document.getElementById('generate-btn');
-            
-            btn.disabled = true;
-            btn.innerText = 'লকড আছে';
-
-            function updateTimer() {
-                const now = new Date().getTime();
-                const startTime = parseInt(localStorage.getItem('aviator_start_time'));
-                const remaining = ANALYSIS_TIME - (now - startTime);
-
-                if (remaining <= 0) {
-                    clearInterval(analysisInterval);
-                    unlockSignalButton();
-                } else {
-                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-                    
-                    const displayMin = minutes < 10 ? '0' + minutes : minutes;
-                    const displaySec = seconds < 10 ? '0' + seconds : seconds;
-
-                    timerText.innerText = `সার্ভার অ্যানালাইসিস বাকি: ${displayMin}:${displaySec} মিনিট`;
-                }
-            }
-
-            updateTimer();
-            analysisInterval = setInterval(updateTimer, 1000);
-        }
-
-        function unlockSignalButton() {
-            const btn = document.getElementById('generate-btn');
-            const statusText = document.getElementById('status-text');
-            const statusDot = document.getElementById('status-dot');
-            const timerText = document.getElementById('timer-text');
-            const boxTitle = document.getElementById('box-title');
-            const multDisplay = document.getElementById('multiplier-display');
-
-            btn.disabled = false;
-            btn.innerText = 'নতুন সিগন্যাল';
-            boxTitle.innerText = 'পরবর্তী সিগন্যাল টার্গেট';
-            multDisplay.innerText = '1.50x';
-            
-            statusText.innerText = 'সিগন্যাল প্রস্তুত';
-            statusText.style.color = '#00e676';
-            statusDot.style.backgroundColor = '#00e676';
-            statusDot.style.boxShadow = '0 0 8px #00e676';
-            
-            timerText.innerText = 'নতুন সিগন্যাল জেনারেট করতে নিচের বোতামটি চাপুন';
-        }
 
         function generateSignal() {
             if (isWaiting) return;
@@ -289,18 +204,17 @@
             statusDot.style.backgroundColor = '#ffb300';
             statusDot.style.boxShadow = '0 0 8px #ffb300';
             
+            // শাফলিং রেঞ্জ ১.৪০ থেকে ৩.০০ এর মধ্যে রাখার জন্য
             const shuffleInterval = setInterval(() => {
-                let tempVal = (Math.random() * (2.03 - 1.00) + 1.00).toFixed(2);
+                let tempVal = (Math.random() * (3.00 - 1.40) + 1.40).toFixed(2);
                 multDisplay.innerText = tempVal + 'x';
             }, 100);
 
             setTimeout(() => {
                 clearInterval(shuffleInterval);
                 
-                let finalSignal = (Math.random() * (2.03 - 1.01) + 1.01).toFixed(2);
-                if (finalSignal > 2.03) {
-                    finalSignal = "2.03";
-                }
+                // ফাইনাল প্রেডিকশন রেঞ্জ ১.৪০ থেকে ৩.০০ এর মধ্যে সীমাবদ্ধ
+                let finalSignal = (Math.random() * (3.00 - 1.40) + 1.40).toFixed(2);
 
                 multDisplay.innerText = finalSignal + 'x';
                 
